@@ -8,7 +8,15 @@ def get_api_key():
     """Fetch the Google Maps API key from Secret Manager"""
     client = secretmanager.SecretManagerServiceClient()
     # Using the project ID from app.py
-    name = "projects/396631018769/secrets/stay-classy-sd-v2-weather/versions/latest"
+    name = "projects/396631018769/secrets/stay-class-sd-v2-secret-2/versions/latest"
+    response = client.access_secret_version(request={"name": name})
+    return response.payload.data.decode("UTF-8")
+
+def get_api_key_geo():
+    """Fetch the Google Maps API key from Secret Manager"""
+    client = secretmanager.SecretManagerServiceClient()
+    # Using the project ID from app.py
+    name = "projects/396631018769/secrets/stay-classy-sd-v2-secrets-geocoding/versions/latest"
     response = client.access_secret_version(request={"name": name})
     return response.payload.data.decode("UTF-8")
 
@@ -22,9 +30,10 @@ def get_weather(location: str):
     """Query the weather for a specific location using Google Maps Weather API (Air Quality)"""
     try:
         api_key = get_api_key()
+        api_key_geo = get_api_key_geo()
         
         # 1. Geocode the location to get lat/lng
-        geocode_url = f"https://maps.googleapis.com/maps/api/geocode/json?address={location}&key={api_key}"
+        geocode_url = f"https://maps.googleapis.com/maps/api/geocode/json?address={location}&key={api_key_geo}"
         geo_resp = requests.get(geocode_url).json()
         
         if geo_resp['status'] != 'OK':
